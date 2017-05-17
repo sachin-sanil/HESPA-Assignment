@@ -40,7 +40,7 @@ int main()
 	int* iteration = new int[img_size*img_size]; //iterations done per pixel
 	double mod2 = 0.0; //absolute value squared
 	double mod = 0.0; // absolute value
-	const int iteration_limit = 50; // maximum number of iterations
+	const int iteration_limit = 200; // maximum number of iterations
 	//computuation begins here:
 	double wcTimeStart= 0.0, wcTimeEnd=0.0;
 	wcTimeStart = getSeconds(); //Start time
@@ -79,20 +79,21 @@ int main()
 	//char for colourbit size pixels * 4 byte
 	std::vector <unsigned char> colourbit;
     colourbit.resize(img_size*img_size * 4);
+    double inv = 1.0/(double)iteration_limit;
 	for (unsigned int j = 0; j < img_size; j++) {
 		for (unsigned int i = 0; i < img_size; i++) {
 			int num = (iteration[j*img_size + i]);
 			colourbit[4 * img_size*j +  4 * i + 3] = 255;
 			colourbit[4 * img_size*j + 4 * i + 2] = 0;//((double)num*0.02)*255;//(num >> 8)%255;
-			colourbit[4 * img_size*j +  4 * i + 1] = ((double)num*0.02)*255;
-			colourbit[4 * img_size*j + 4 * i + 0] = ((double)num*0.02)*255;
+			colourbit[4 * img_size*j +  4 * i + 1] = ((double)num*inv)*255;
+			colourbit[4 * img_size*j + 4 * i + 0] = ((double)num*inv)*255;
 			//std::cout<< (iteration[j*img_size + i]) << std::endl;
 		}
 	}
 	wcTimeEnd = getSeconds();//Final time
 	encodeImage("JuliaCPU.png", colourbit, img_size, img_size);
 	std::cout << "The image has been generated and is named as JuliaCPU.png" << std::endl;
-	std::cout << "Time Taken for image encoding: " << wcTimeEnd-wcTimeStart << " sec" << std::endl;
+	std::cout << "Time Taken for image encoding: " << (wcTimeEnd-wcTimeStart)*1e3 << " milli-sec" << std::endl;
 
 	delete(range);
 	delete(iteration);

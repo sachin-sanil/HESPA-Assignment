@@ -4,6 +4,7 @@
 #include <memory>
 #include<fstream>
 #include "lodepng.h"
+#include<sys/time.h>
 
 //Encode from raw pixels to disk with a single function call
 //he image argument has width * height RGBA pixels or width * height * 4 bytes
@@ -16,22 +17,35 @@ void encodeImage(const char* filename, std::vector<unsigned char>& image, unsign
 	if (error) std::cout << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
 }
 
+double getSeconds()
+{
+	struct timeval tp;
+	gettimeofday(&tp, NULL);
+	return ((double)tp.tv_sec + (double)tp.tv_usec * 1e-6);
+}
+
 int main(int argc, char* argv[])
 {
 	std::stringstream s;
-	s << argv[1];
+	if(argc>1){
+    s << argv[1];
+    }
+    else
+    {
+        std::cout<< "Number of threads/work items not given " <<std::endl;
+        return 0;
+    }
 	int work_items_per_group=0;
 	s >> work_items_per_group; // threads per block/ work items per work group
 	int img_size = 2048; // image pixle size
-	int work_groups = (img_size*img_size) / work_items_per_group; //total number of work groups
+	//int work_groups = (img_size*img_size) / work_items_per_group; //total number of work groups
 	double spacing = 4.0 / (double) img_size;
 	double h = spacing;
 	int max_iterations = 200;
 	//std::vector<unsigned char> color_bit_host(img_size * 4, 55);
 	std::vector <unsigned char> colourbit;
 	colourbit.resize(img_size*img_size * 4);
-	double* grid_values = new double[img_size*img_size];
-
+	
 	//get platform
 	std::vector<cl::Platform> platforms;
 	cl::Platform::get(&platforms);
@@ -80,10 +94,13 @@ int main(int argc, char* argv[])
 	
 	// Set the kernel arguments
 	color_kernel.setArg(0, colourBit_device);
-	color_kernel.setArg(1, buffer_h);
-	color_kernel.setArg(2, max_iter_dev);
-	color_kernel.setArg(3, img_size_dev);
-
+	color_kernel.setArg(1, &buffer_h);
+	color_kernel.setArg(2, &max_iter_dev);
+	color_kernel.setArg(3, &img_size_dev);
+    
+    double wcTimestart =0.0;
+    double wcTimeend = 0.0;
+    wcTimestart = getSeconds();
 	//execute kernel
 	cl::NDRange global(img_size, img_size);
 	cl::NDRange local(work_items_per_group, work_items_per_group);
@@ -91,8 +108,10 @@ int main(int argc, char* argv[])
 	
 	//copy colourbit from device to host
 	queue.enqueueReadBuffer(colourBit_device, CL_TRUE, 0, img_size *img_size * 4 * sizeof(unsigned char), &colourbit[0]);
+    wcTimeend =getSeconds();
 	//encode image
 	encodeImage("JuliaCPU.png", colourbit, img_size, img_size);
+    std::cout << "Time taken for kernel execution and writeback: " << (wcTimeend-wcTimestart)*1e3 << "milli-sec" <<std::endl;
 	std::cout << "The image has been generated and is named as JuliaCPU.png" << std::endl;	
 	return 0;
 }
