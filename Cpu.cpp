@@ -40,7 +40,7 @@ int main()
 	int* iteration = new int[img_size*img_size]; //iterations done per pixel
 	double mod2 = 0.0; //absolute value squared
 	double mod = 0.0; // absolute value
-	const int iteration_limit = 200; // maximum number of iterations
+	const int iteration_limit = 50; // maximum number of iterations
 	//computuation begins here:
 	double wcTimeStart= 0.0, wcTimeEnd=0.0;
 	wcTimeStart = getSeconds(); //Start time
@@ -59,7 +59,7 @@ int main()
 			int iter = 0; //track iteration
 			c_real = -0.8;
 			c_img = 0.2;
-			while (mod<=10 && iter<= iteration_limit)
+			while (mod<=20 && iter< iteration_limit)
 			{
 				//z_new = z_old^2+c
 				temp = real*real - img*img + c_real;
@@ -81,11 +81,12 @@ int main()
     colourbit.resize(img_size*img_size * 4);
 	for (unsigned int j = 0; j < img_size; j++) {
 		for (unsigned int i = 0; i < img_size; i++) {
-			int num = (iteration[j*img_size + i]%201)*100000;
-			colourbit[4 * img_size*j + 4 * i + 3] = num % 255;
-			colourbit[4 * img_size*j + 4 * i + 2] = (num >> 8)%255;
-			colourbit[4 * img_size*j + 4 * i + 1] = (num >> 16)%255;
-			colourbit[4 * img_size*j + 4 * i + 0] = (num >> 24)%255;
+			int num = (iteration[j*img_size + i]);
+			colourbit[4 * img_size*j +  4 * i + 3] = 255;
+			colourbit[4 * img_size*j + 4 * i + 2] = 0;//((double)num*0.02)*255;//(num >> 8)%255;
+			colourbit[4 * img_size*j +  4 * i + 1] = ((double)num*0.02)*255;
+			colourbit[4 * img_size*j + 4 * i + 0] = ((double)num*0.02)*255;
+			//std::cout<< (iteration[j*img_size + i]) << std::endl;
 		}
 	}
 	wcTimeEnd = getSeconds();//Final time
