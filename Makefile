@@ -13,6 +13,6 @@ CL:	$(LINK)
 testc:
 	./juliaCPU
 testcl:
-	./juliaCL 128
+	./juliaCL 64 64
 clean:
-	@$(RM) -rf *.o *.png $(CPU_EXE) 
+	@$(RM) -rf *.o *.png *.txt $(CPU_EXE) $(CL)

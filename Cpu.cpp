@@ -74,7 +74,7 @@ int main()
 		}
 	}
 	wcTimeEnd = getSeconds(); //End time
-	std::cout << "Done with operations, begin image encoding!" << std::endl;
+	std::cout << "Done with operations, begin pixel calculations!" << std::endl;
 	std::cout << "Time Taken for computation: " << wcTimeEnd-wcTimeStart << " sec" << std::endl;
 	//char for colourbit size pixels * 4 byte
 	std::vector <unsigned char> colourbit;
@@ -91,10 +91,10 @@ int main()
 		}
 	}
 	wcTimeEnd = getSeconds();//Final time
+    std::cout << "The time to execute pixel calc. using CPU for max " << iteration_limit << " iterations "  << (wcTimeEnd-wcTimeStart)*1e3 <<  " milli-sec" << std::endl;
 	encodeImage("JuliaCPU.png", colourbit, img_size, img_size);
 	std::cout << "The image has been generated and is named as JuliaCPU.png" << std::endl;
-	std::cout << "Time Taken for image encoding: " << (wcTimeEnd-wcTimeStart)*1e3 << " milli-sec" << std::endl;
-
+	
 	delete(range);
 	delete(iteration);
 	return 0;
